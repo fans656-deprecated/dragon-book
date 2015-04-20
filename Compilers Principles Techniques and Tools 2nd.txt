@@ -1,0 +1,17 @@
+2015-04-20 21:08:44
+[24]
+“We shall discover that a few basic ideas can be used to construct translators for a wide variety of languages and machines.”
+
+"An important role of the compiler is to report any erros in the source program that it detects during the translation process."
+想python，运行时抛异常，这个倒不算compiler的功劳，，不过python里syntax error也是(勉强算)在运行时
+
+[27]
+lexical, grammatical, semantical
+词法，语法，语义
+
+[29]
+    a = b + c
+语法层面这条语句是没问题的，不过语义层面的话，可能这仨变量都未定义，那就是语义错误了
+
+grammatical phase 能把 a 放入symbol table，指明这是一个 id
+sementical phase 才能补充完整 a 的其他信息，比如它是一个 int 型变量
