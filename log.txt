@@ -31,3 +31,15 @@ terminal 是不是可以有 <num> 这种多值的家伙？
 
 [66]
 比如 60 是 lexeme，<integer, 60> 是 token
+
+2015-05-08 23:01:06
+[67]
+看到 deriviation 这里，又撞见 tree drawing 了...
+想把 deriviation 的过程画成一棵树，就是 syntax tree 嘛
+
+2015-05-09 16:41:58
+忽然想到，Wetherell-Shannon 算法已经足够画 syntax tree 了——它们只是画 binary tree 比较蛋疼
+
+2015-05-09 18:36:05
+似乎随机的话很容易就没尽头了
+呃，似乎不是，代码写错了应该
