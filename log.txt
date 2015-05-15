@@ -43,3 +43,124 @@ terminal 是不是可以有 <num> 这种多值的家伙？
 2015-05-09 18:36:05
 似乎随机的话很容易就没尽头了
 呃，似乎不是，代码写错了应该
+
+2015-05-09 22:06:21
+搞定，不过随机derive的话稍微复杂点的grammar就recursion溢出了
+
+2015-05-10 21:10:56
+[99]
+    distance = speed * time
+这里，'distance' 是 lexeme，<id, a-pointer-to-the-distance-variable> 是 token
+id 是 terminal
+
+2015-05-10 21:43:26
+关于c里头实现 token，想这么弄：
+    enum Name {
+        NUM = 256, ID, IF, ELSE, RETURN,
+    };
+    struct Token {
+        Name name;
+        int intVal;
+        double floatVal;
+        char *strVal;
+    };
+对于 + - * / 这种，直接就 type = '+' 了
+定义 ADD SUB 之类的不合适，因为 - 也可能是 unary negate operator
+
+256 可以保证这些抽象 token name 不会与ASCII冲突
+不过说到这里，如果源程序的字符集用 UNICODE 呢？
+那么拿 code point 作 charecter value 的话，最好还是另起一套抽象name了
+
+2015-05-11 17:23:44
+[to learn]
+http://www.zhihu.com/question/26188036/answer/32472910
+这个家伙开了个专栏“从零开始写个编译器吧”
+
+http://www.zhihu.com/question/26188036/answer/32458630
+这里推荐了好多 略高深 的资源(书)
+
+2015-05-12 18:39:44
+[114]
+python 里头
+    i = 0
+    for i in range(3):
+        pass
+    print i
+输出 2
+for 语句改写了 i
+
+设想 el 可以这么处理：
+如果 for 外层有 i 的声明，那么 for 中的 i 就只在 for 中有效
+如果 for 外层没有 i 的声明，那么 for 中的 i 就会 leak 到 for 之后
+
+这种 leak 有时候是方便的，比如检查 for 是不是被 break 出来的
+
+2015-05-15 12:27:58
+[65]
+terminals 就是语言中能出现的所有符号
+这么想嘛，一个源程序的 token 流，里面的东西都是 terminal，不会出现 nonterminal——后者是 parse 结构用的
+token 有 name 和 value，terminal 指的是 name
+比如 <num, 656> ，这里 num 是 terminal；<id, foo>，这里 id 是 terminal
+<while>，while 就是 terminal
+
+syntax tree 就是以这些 token 流为叶节点构建起的一棵树，中间节点都是 nonterminal
+
+2015-05-15 14:09:09
+[44() - 67]
+重写了一次从 text 构造 grammar，上次21行只是求出 nt, t 集合，这次23行连 production 也做出来啦~
+
+2015-05-15 17:27:16
+[67]
+language 就是一个 string 的集合，这个集合包含了所有能从 start symbol derive 出来的 terminal string
+
+2015-05-15 17:45:20
+grammar 只能定义语法(syntax), 无法定义语义(semantics)
+比如
+    list -> digit opt-list
+    opt-list -> + digit opt-list | - digit opt-list | \epsilon
+    digit -> 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+和
+    list -> list + digit | list - digit | digit
+    digit -> 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+都能 derive 出来 9 - 5 + 2
+但前者相当于 9 - (5 + 2) 后者相当于 (9 - 5) + 2
+语义是不一样的
+
+两个grammar定义的 language 相等只是说明 terminal strings 集合相等
+至于语义，这种严格定义的 language 并不负责
+
+2015-05-15 18:07:28
+http://en.wikipedia.org/wiki/Formal_language
+formal language 就是一个 string 集合
+可以用任何手段构造这个集合，context-free grammar 是其中一种
+language 里的 string 只是 symbol 的连接，本身没有任何意义
+比如wiki例子里的 0 = 1，只是符号的排列而已，nothing more
+
+编译原理里头，其实通过 lexer 把 parser 隔离在最 atomic item (i.e. characters like ASCII or UNICODE)外了
+parser 面对的 alphabet 是 token name 的集合
+
+2015-05-15 18:20:42
+ah, 其实 lexer 做的那些工作也可以直接集合到 grammar 里，比如
+    num -> non-zero digits
+    non-zero -> 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+    digits -> digits digit | digit
+    digit -> non-zero | 0
+    
+    expr -> id ws + ws id
+    ws -> space | tab | newline
+    ...
+只不过用 lexer 的办法简化了 parser 的编写，，另外可能也有效率的考虑
+lexer 用 dfa 实现，parser 用 lr, ll 神马的
+
+
+"those strings for which some decision procedure (an algorithm that asks a sequence of related YES/NO questions) produces the answer YES."
+其实 lexer 和 parser 的关系也有点类似下面的情境：
+本来任意string的 acceptance problem 都可以用 dfa 来描述
+但如果本来可以用一个很简单的 dfa (比如接受数字的dfa)，加几条预置的规则(比如 "foo", "bar" 这种也accept)
+那么这两个结合在一个 procedure 里(先查预置规则，决定不了再feed给dfa)，就双方方便了
+
+
+http://en.wikipedia.org/wiki/Chomsky_hierarchy
+left-hand side -> right-hand side
+左边不定只是一个 non-terminal，这可能只是 context-free grammar 的要求
+其实左右都可以是 symbol string
