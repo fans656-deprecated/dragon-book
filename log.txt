@@ -164,3 +164,345 @@ http://en.wikipedia.org/wiki/Chomsky_hierarchy
 left-hand side -> right-hand side
 左边不定只是一个 non-terminal，这可能只是 context-free grammar 的要求
 其实左右都可以是 symbol string
+
+2015-05-16 13:55:37
+[74]
+    E2.2.3
+c)
+    S(S)S => S(S)S (S)   S   => ()()
+    S(S)S =>   S   (S) S(S)S => ()()
+d)
+    aSbS => a bSaS b   S  => abab
+    aSbS => a  S   b aSbS => abab
+e)
+    S+S => S+S +  S  => a + a + a
+    S+S =>  S  + S+S => a + a + a
+    
+
+http://en.wikipedia.org/wiki/Arithmetic
+arithmetic 就是 + - * /
+
+    E2.2.4
+a)
+    expr -> expr expr op | digit
+    op -> + | - | * | /
+    digit -> 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+b)
+    list -> list , id | id
+c)
+    list -> id , list | id
+d)
+    expr -> expr + term | expr - term | term
+    term -> term * prim | term / prim | prim
+    prim -> ( expr ) | num | id
+e)
+    expr -> expr + term | expr - term | term
+    term -> term * prim | term / prim | prim
+    prim -> - prim' | + prim' | prim'
+    prim' -> ( expr ) | num | id
+    
+    
+    E2.2.5
+a)
+    11 == 3 能被 3 整除，1001 == 9 能被 3 整除
+    如果 a 能被 3 整除，则 a 0 == a * 2 也能
+    如果 a, b 均能被 3 整除，则 a b == a * 2^n + b 也能
+b)
+    似乎可以？怎么证明？
+    
+    
+    E2.2.6
+
+http://en.wikipedia.org/wiki/Roman_numerals
+罗马数字的 digits 是 I V X  L  C   D   M
+分别代表             1 5 10 50 100 500 1000
+最多三个相加比如 II III XX MMM
+代表             2  3   20 3000
+10的倍数digit四个相加用减法表示  IV  CD  CM
+                                 4   400 900
+再往后大数加至多3个小数  VIII DCC
+                         8    700  
+在我们的约定里，最大的数是 MMMCCCXXXIII
+                           3333
+
+我艹.. 这 grammar 要怎么写
+算法的话，
+每个进制上的数字都用3个element来组合产生
+比如 I II III IV V VI VII VIII IX 用到 I V X 表示个位数上的 digit
+     X XX XXX XL L LX LXX LXXX XC 用到 X L C 表示十位数上的 digit
+     C CC CCC CD D DC DCC DCCC CM 用到 C D M 表示百位数上的 digit
+     M MM MMM 千位数只能到3
+     
+    num -> ms opt-cs opt-xs opt-is
+         | opt-ms cs opt-xs opt-is
+         | opt-ms opt-cs xs opt-is
+         | opt-ms opt-cs opt-xs is
+    opt-is -> is | \epsilon
+    opt-xs -> xs | \epsilon
+    opt-cs -> cs | \epsilon
+    opt-ms -> ms | \epsilon
+    is -> I | II | III | IV | V | VI | VII | VIII | IX
+    xs -> X | XX | XXX | XL | L | LX | LXX | LXXX | XC
+    cs -> C | CC | CCC | CD | D | DC | DCC | DCCC | CM
+    ms -> M | MM | MMM
+
+2015-05-16 16:16:34
+syntax directed definition 就是给 grammar 的每个 production 都加上 semantic rule (用于计算 attributes)
+simple SDD 就是 semantic rule 里头用的 attributes 与 production body 组成相同、顺序相同，除了可以在其间添加一些额外的 value
+
+syntax directed translation scheme 就是给 grammar 的每个 production body 都 embed 上 semantic action
+
+
+http://en.wikipedia.org/wiki/Syntax-directed_translation
+呃，上面的理解可能不准确，，往后看了更多时再说吧
+
+2015-05-16 19:44:01
+    e2.3.1
+    
+    expr -> { print '+' } expr1 + term
+    expr -> { print '-' } expr1 - term
+    expr -> term
+    term -> { print '*' } term1 * prim
+    term -> { print '/' } term1 / prim
+    term -> prim
+    prim -> ( expr )
+    prim -> 0 { print '0' }
+    ...
+    prim -> 9 { print '9' }
+    
+    
+    e2.3.2
+    
+    S -> S { print '+' } S +
+    S -> S { print '-' } S -
+    S -> S { print '*' } S *
+    S -> S { print '/' } S /
+    S -> 0 { print '0' }
+    ...
+    S -> 9 { print '9' }
+
+2015-05-16 20:59:51
+https://www.mathsisfun.com/numbers/numbers-numerals-digits.html
+digit, numeral, number
+
+digit 是单个 symbol，比如 0, 1, 2, ...
+numeral 是由 digit 组成的 symbols，比如 12, 656
+number 是一个数学概念，它由 numeral 来表示，比如 4, IV
+
+2015-05-16 21:13:05
+之前 roman numeral 说错了，最大应该是 3999
+因为只有 M 最多重复三次，其他的都是可以到 900, 80 之类的
+
+    e2.3.3
+
+    num -> d0p
+    num -> d1p d0
+    num -> d2p d1 d0
+    num -> d3p d2 d1 d0
+
+    d0 -> d0p
+    d0 -> 0
+    d0p -> 1 { print 'I' }
+    d0p -> 2 { print 'II' }
+    d0p -> 3 { print 'III' }
+    d0p -> 4 { print 'IV' }
+    d0p -> 5 { print 'V' }
+    d0p -> 6 { print 'VI' }
+    d0p -> 7 { print 'VII' }
+    d0p -> 8 { print 'VIII' }
+    d0p -> 9 { print 'IX' }
+
+    d1 -> d1p
+    d1 -> 0
+    d1p -> 1 { print 'X' }
+    d1p -> 2 { print 'XX' }
+    d1p -> 3 { print 'XXX' }
+    d1p -> 4 { print 'XL' }
+    d1p -> 5 { print 'L' }
+    d1p -> 6 { print 'LX' }
+    d1p -> 7 { print 'LXX' }
+    d1p -> 8 { print 'LXXX' }
+    d1p -> 9 { print 'XC' }
+
+    d2 -> d2p
+    d2 -> 0
+    d2p -> 1 { print 'C' }
+    d2p -> 2 { print 'CC' }
+    d2p -> 3 { print 'CCC' }
+    d2p -> 4 { print 'CD' }
+    d2p -> 5 { print 'D' }
+    d2p -> 6 { print 'DC' }
+    d2p -> 7 { print 'DCC' }
+    d2p -> 8 { print 'DCCC' }
+    d2p -> 9 { print 'CM' }
+
+    d3p -> 1 { print 'M' }
+    d3p -> 2 { print 'MM' }
+    d3p -> 3 { print 'MMM' }
+    
+    
+http://www.cs.bath.ac.uk/~occ/comp0029/roman_numerals.shtml
+这里讲了 roman numberal -> integer 的 context-free grammar
+另外，这里的设定是 M 可以重复任意次——这样就能表达任意大的数了
+
+想试试这种方式，先简化一下：造一个 cfg 可以把 integer 转换为棒棒
+    1 => 1
+    3 => 111
+    8 => 11111111
+    13 => 1111111111111
+
+想出一种利用 synthesis 的办法
+    num -> ds d { print ds.t + d.t }
+    num -> d { print d.t }
+    ds -> ds1 d { ds.t = (ds1.t + d.t) * 10 }
+    ds -> d { ds.t = d.t * 10 }
+    d -> 0 | .. | 9  { d.t = '1' | '11' | ... | '111111111' }
+呃，但是目前学到的东西跟这个不太搭呃
+感觉现在这个阶段，不知道怎么构造 syntax tree——直到第二章结束也只能 recursive descent
+所以先不纠结了
+
+
+    e2.3.4
+    
+    num -> d0
+    num -> d1 d0z
+    num -> d2 d1z d0z
+    num -> d3 d2z d1z d0z
+
+    d0 -> I     { print '1' }
+    d0 -> II    { print '2' }
+    d0 -> III   { print '3' }
+    d0 -> IV    { print '4' }
+    d0 -> V     { print '5' }
+    d0 -> VI    { print '6' }
+    d0 -> VII   { print '7' }
+    d0 -> VIII  { print '8' }
+    d0 -> IX    { print '9' }
+    d0z -> d0
+    d0z -> \epsilon { print '0' }
+
+    d1 -> X     { print '1' }
+    d1 -> XX    { print '2' }
+    d1 -> XXX   { print '3' }
+    d1 -> XL    { print '4' }
+    d1 -> L     { print '5' }
+    d1 -> LX    { print '6' }
+    d1 -> LXX   { print '7' }
+    d1 -> LXXX  { print '8' }
+    d1 -> XC    { print '9' }
+    d1z -> d1
+    d1z -> \epsilon { print '0' }
+
+    d2 -> C     { print '1' }
+    d2 -> CC    { print '2' }
+    d2 -> CCC   { print '3' }
+    d2 -> CD    { print '4' }
+    d2 -> D     { print '5' }
+    d2 -> DC    { print '6' }
+    d2 -> DCC   { print '7' }
+    d2 -> DCCC  { print '8' }
+    d2 -> CM    { print '9' }
+    d2z -> d2
+    d2z -> \epsilon { print '0' }
+
+    d3 -> M     { print '1' }
+    d3 -> MM    { print '2' }
+    d3 -> MMM   { print '3' }
+    
+    
+    e2.3.5
+    
+    S -> {print '('} S {print '+'} S {print ')'} +
+    S -> {print '('} S {print '-'} S {print ')'} -
+    S -> S {print '*'} S *
+    S -> S {print '/'} S /
+    S -> 0 { print '0' }
+    ...
+    S -> 9 { print '9' }
+    
+恩... 加括号就好了，多余的无所谓
+
+2015-05-16 23:43:07
+predictive parsing 就是每个 nonterminal 的 production body 都拥有 disjoint FIRST集 的 recursive descent parsing
+话说第四章看完后倒也可以用这种办法实现一个语言
+记得本科学编原的时候最高级也就是写了个 predictive parser，实现了一个 C 的子集，，没有指针，没有函数，只有一些 if else switch for 和声明、赋值语句
+
+2015-05-16 23:51:54
+[66() - 89]
+咦，只 disjoint FIRST 还不够
+    <optexpr> -> <expr>
+               | \epsilon
+这样的，如果能 match <expr> 的 FIRST，但更进一步的parse失败了，，那么还可能回退到 \epsilon 这里
+
+2015-05-17 10:27:38
+[67() - 90]
+一切左递归都可以转化成右递归(尾递归)，而尾递归都可以转化为 iteration
+这就解决了 recursive descent 需要通过转化来处理左递归而保持语义不变的问题
+
+
+http://en.wikipedia.org/wiki/Tail_call
+tail recursion elimination
+
+2015-05-17 11:00:00
+我擦，e2.4.6 的 b 和 c 都没法直接用 recursive descent 呃
+
+2015-05-17 12:28:23
+[69() - 92]
+消除左递归时把 semantic action 当成普通的 terminal 就好了
+
+concrete syntax tree 是从 comprise 的角度 depict 的
+    if-stmt -> if ( expr ) stmt
+    expr -> expr + term
+
+abstract syntax tree 是从 operate 的角度 depict 的
+    if -> (+ 3 5) (= a 8)
+    + -> 3 5
+    
+忽然发现 lisp 就是 abstrct syntax tree 呃
+
+2015-05-17 14:51:22
+[77() - 100]
+编译期用到某些 identifier 的 attribute(value) 时，就需要 chained symbol table 了
+比如同一个 identifier: a 被在两个 nested scope 中声明了两次，分别是 int 和 float
+
+2015-05-17 17:28:05
+[78() - 101]
+num 交给 lexer 去做而非 parser 的原因是，regular grammar 就能完成的工作，就没必要动用 context-free grammar 来增加复杂度了
+
+2015-05-17 19:41:01
+[85() - 108]
+对于EOF的处理一直不太清晰
+刚才想到也许用DFA例的 acceptable state 可以澄清一点
+比如 foo 在读到 f 的时候就已经 acceptable 了，如果下一个不是 o 而是 EOF，那么返回 <id, f> 就没问题
+但是对于 comment 这种，读入 /* 之后并非 acceptable state，只有再读到 */ 后才算完 (c++编译器会报错“unterminated comment”)
+
+2015-05-17 19:54:57
+我靠，手写复杂点的 lexer 真是各种蛋疼
+
+2015-05-17 20:20:53
+https://news.ycombinator.com/item?id=1105007
+几个人聊了些 lexer 有关
+http://programmers.stackexchange.com/a/154591/176164
+关于手写lexer和生成lexer，以及FSM究竟是否outdated的讨论
+http://programmers.stackexchange.com/a/154624/176164
+这里提到 packrat，一种 lexerless parser
+以及说 dragon book 已经相当 outdated 了，甚至不该读 -____-b
+
+http://bford.info/packrat/
+packrat 以及 peg(parsing expression grammar)
+an alternative to context free grammar
+
+http://stackoverflow.com/a/1419466/3881776
+Pyparsing
+
+http://pdos.csail.mit.edu/~baford/packrat/thesis/
+好像最早的论文里头使用haskell来实现的
+对了，packrat 还有一条很兴奋的性质是：“provides better composition properties... more suitable for dynamic or extensible languages”
+正像自己设想中 el 的做法
+
+http://en.wikipedia.org/wiki/Parsing_expression_grammar
+PEG 的 wiki
+
+
+顺便感慨一下，有时候不知名的一个搜索就能打开一个崭新的世界
+(自己本来只是手写lexer写不出来，就随手搜了下 hand written lexer)
