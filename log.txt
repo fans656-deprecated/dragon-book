@@ -16,6 +16,10 @@ lexical, grammatical, semantical
 grammatical phase 能把 a 放入symbol table，指明这是一个 id
 sementical phase 才能补充完整 a 的其他信息，比如它是一个 int 型变量
 
+2015-04-29 08:46:08
+http://zhuanlan.zhihu.com/forallplt/19994962
+函数式语言的编译优化
+
 2015-05-03 08:19:44
 [todo]
 reverse polish notation
@@ -506,3 +510,57 @@ PEG 的 wiki
 
 顺便感慨一下，有时候不知名的一个搜索就能打开一个崭新的世界
 (自己本来只是手写lexer写不出来，就随手搜了下 hand written lexer)
+
+2015-05-17 22:04:07
+https://www.google.com/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=nested%20comment
+http://programmers.stackexchange.com/questions/81072/why-do-most-programming-languages-not-nest-block-comments
+http://programmers.stackexchange.com/questions/116330/why-dont-more-languages-support-recursive-nested-comments/116339#116339
+http://stackoverflow.com/questions/2969198/why-are-nested-comments-forbidden
+
+我去，一个 "nested comment" 都能引出这么多故事
+
+2015-05-17 22:32:54
+http://mortoray.com/2012/07/20/why-i-dont-use-a-parser-generator/
+why i don't use a parser generator
+
+2015-05-17 23:48:31
+http://www.zhihu.com/question/30441331
+https://github.com/EarlGray/c4
+(x86 JIT compiler in 86 lines)
+这里说可以不生成二进制文件，直接放内存执行就好
+
+2015-05-18 17:24:24
+http://www.zhihu.com/question/30457875
+想用用flex和bison写个C的编译器，应该如何处理C的宏？
+如果参考一个很简单但完整的C编译器，lcc：drh/lcc · GitHub
+
+2015-05-19 21:07:58
+    see p84 extended lexer
+行号应该由 eatSpace 来做，反正它要检查 '\n'
+列号由 getChar 来做，由 eatSpace 遇到 '\n' 来重置
+eatComment 也要处理行号和列号
+
+呃，行号列号交给 getChar 处理更好些，可以简化 eatComment
+
+
+在开始 getToken 就遇到 EOF 的时候应该抛出异常
+否则 "a b" 这种在读完 b 之后再 getToken 就会一直返回 (id, b)
+这里的问题是：
+    一旦进入identifier 就是 accepted 状态
+    所以此时 b 后面的 EOF 被 supressed
+    peek 仍然是 'b'
+    下次再读，由于 eatSpace 镇压了 EOF，就又正常执行返回 b 了
+
+唔.. 只去掉 eatSpace 里的 try except 还不行，必须在读到 EOF 的时候把 peek 置为“非法值”——但是什么是非法值呢？只要语义上让 eatSpace 能读到 EOF 就行了
+所以置为 ' ' 就可以
+
+2015-05-19 22:05:46
+读取小数部分时要区分之前是否读入了整数部分
+因为如果读入了整数部分，小数点后面是可以为空的 e.g.  2.
+否则不能为空 e.g.  .foo .23
+
+注意读取单操作符后，要 getChar
+
+2015-05-19 22:53:47
+用了差不多150行写出来了，两个小时
+测试写得还不是很清爽，，感觉这东西确实需要全面的测试呃
